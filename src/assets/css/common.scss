@@ -1,0 +1,29 @@
+body {
+  background: #EAEEF3;
+}
+
+.ell {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+fl {
+  float: left;
+}
+
+fr {
+  float: right;
+}
+
+.poptip-list {
+  line-height: 2.6;
+  min-width: 90px;
+  li {
+    text-align: center;
+    cursor: pointer;
+  }
+  li:hover {
+    background-color: #F3F3F3;
+  }
+}

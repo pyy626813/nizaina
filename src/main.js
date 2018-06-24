@@ -5,7 +5,7 @@ import VueRouter from 'vue-router'
 import routes from './router'
 import Vuex from 'vuex'
 import VuexConfig from './vuex'
-import iView from 'iview';
+import iView from 'iview'
 
 //项目依赖文件
 import lib from './lib';

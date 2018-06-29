@@ -31,7 +31,7 @@
 
         <FormItem>
           <Button type="primary" @click="handleSubmit('formValidate')">提交</Button>
-          <Button type="ghost" @click="handleReset('formValidate')" style="margin-left: 8px">重置</Button>
+         <!-- <Button type="ghost" @click="handleReset('formValidate')" style="margin-left: 8px">重置</Button>-->
         </FormItem>
       </Form>
     </div>
@@ -94,7 +94,9 @@
 <style rel="stylesheet/scss" lang="scss">
   body{
     background-image: url("../assets/images/bannerBg1.jpg");
-    background-size: cover;
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+    opacity: 0.5;
   }
   .submit{
     width: 100%;
@@ -103,7 +105,8 @@
     .hd-top{
       width: 500px;
       text-align: center;
-      margin-left: 10%;
+      margin: 0 auto;
+      //margin-left: 10%;
       line-height: 2.6;
       font-size: 36px;
       color: #ffffff;
@@ -112,17 +115,18 @@
       letter-spacing: 2px;
     }
     .bd-content{
-      color: #ffffff;
+      color: #333333;
       background-color: #fff;
       width: 500px;
-      margin-top: 20px;
-      margin-left: 10%;
+      margin: 0 auto;
+      //margin-top: 20px;
+     // margin-left: 10%;
       padding: 40px 40px 20px 20px;
       border-radius: 10px;
-      background-color: rgba(225,225,225,.3);
+      background-color: rgba(225,225,225,.7);
       box-shadow: 0px 0px 40px #ffffff;
       .ivu-form .ivu-form-item-label{
-        color: #ffffff;
+        color: #333333;
       }
       .ivu-btn-ghost{
         color: #ffffff;

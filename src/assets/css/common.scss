@@ -2,8 +2,10 @@ html{
   height: 100%;
 }
 
-body {
-  background: #ffffff;
+body{
+  background-image: url("../images/bannerBg1.jpg");
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
 }
 
 .ell {
@@ -20,14 +22,7 @@ fr {
   float: right;
 }
 
-.poptip-list {
-  line-height: 2.6;
-  min-width: 90px;
-  li {
-    text-align: center;
-    cursor: pointer;
-  }
-  li:hover {
-    background-color: #F3F3F3;
-  }
+textarea.ivu-input {
+  font-size: 12px !important;
+  vertical-align: inherit
 }

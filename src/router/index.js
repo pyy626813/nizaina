@@ -1,11 +1,11 @@
 var routers = [{
-  path: '/',
-  name: 'index',
+  path: '/add',
+  name: 'add',
   component(resolve) {
-    require(['../views/index.vue'], resolve)
+    require(['../views/add.vue'], resolve)
   }
 },{
-  path: '/list',
+  path: '/',
   name: 'list',
   component(resolve) {
     require(['../views/list.vue'], resolve)

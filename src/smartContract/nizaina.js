@@ -8,13 +8,15 @@ class response {
     return {code: 0, data: data, msg: msg}
   }
 
-  static fail(msg) {
-    return {code: -1, msg: msg}
+  static fail(msg,code) {
+    return {msg: msg,code: code || -1}
   }
 }
 
 var wxm = function () {
   LocalContractStorage.defineProperty(this, "adminAddress");
+  //查看隐私信息最低费用
+  LocalContractStorage.defineProperty(this, "priceForSecret");
   //{名称：[address]}
   LocalContractStorage.defineMapProperty(this, "nameMap");
   //{address:userInfo}
@@ -22,10 +24,17 @@ var wxm = function () {
 };
 
 wxm.prototype = {
-  init () {
-    this.admin = Blockchain.transaction.from;
+  init() {
+    this.adminAddress = Blockchain.transaction.from;
+    this.priceForSecret = 0.01;
   },
-  addUserInfo (user) {
+  addUserInfo(user) {
+    var value = Blockchain.transaction.value;
+    if(value < 0.01){
+      //支付金额不足0.01
+      return response.fail('money is less than 0.01',-2);
+    }
+
     var from = Blockchain.transaction.from;
     user = user || {};
     var name = user.name;
@@ -33,33 +42,33 @@ wxm.prototype = {
       return response.fail('name property is required');
     }
     //同个地址用户名称发生变化
-    var oldUser = this.userMap[from];
-    if (oldUser && oldUser.name != name) {
-      this._deleteOldName(oldUser.name, from);
+    var oldUser = this.userMap.get(from);
+    if (oldUser) {
+      this._deleteOldUser(oldUser.name, from);
     }
 
-    var addresses = this.nameMap[name];
-    var addresses = this.nameMap[name];
+    var addresses = this.nameMap.get(name);
     if (addresses) {
-      addresses.push(user)
+      addresses.push(from)
     } else {
-      addresses = [user];
+      addresses = [from];
     }
     this.nameMap.set(name, addresses);
     this.userMap.set(from, user);
     return response.ok();
   },
-  searchUsers (name) {
+  searchUsers(name) {
     if (!name) {
-      return response.ok([]);
+      return response.ok([], 'name is required');
     }
-    var addresses = this.nameMap[name];
+    var addresses = this.nameMap.get(name);
     var users = [];
     if (addresses && addresses.length > 0) {
       addresses.forEach(address => {
         var user = this.userMap.get(address);
         if (user) {
           this._deleteSecretValues(user);
+          user.nasAddress = address;
           users.push(user);
         }
       });
@@ -67,11 +76,18 @@ wxm.prototype = {
     return response.ok(users);
   },
   //查看用户隐私信息
-  getSecretInfo (fromAddress) {
+  getSecretInfo(fromAddress) {
     if (!fromAddress) {
-      return response.fail();
+      return response.fail('缺少查看的用户地址');
     }
-    var user = this.userMap[fromAddress];
+
+    var value = Blockchain.transaction.value;
+    if (value < this.priceForSecret) {
+      //支付金额不足
+      return response.fail('money is less than ' + this.priceForSecret,-2);
+    }
+
+    var user = this.userMap.get(fromAddress);
     var rs = {};
     if (user) {
       secretProps.forEach(prop => {
@@ -80,11 +96,22 @@ wxm.prototype = {
     }
     return rs;
   },
+  //调整查看隐私信息手术费
+  adjustPriceForSecret(price) {
+    if (!this._isAdmin()) {
+      return response.fail('operation not permitted');
+    }
+    if (!price) {
+      price = 0;
+    }
+    this.priceForSecret = parseFloat(price);
+    return super.ok(null, '调整后');
+  },
   //提现至管理员
-  withdraw (value) {
+  withdraw(value) {
     var address = Blockchain.transaction.from;
-    if (address == this.admin) {
-      return response.fail('you are not admin');
+    if (!this._isAdmin()) {
+      return response.fail('operation not permitted');
     }
     var result = Blockchain.transfer(address, value);
     if (result) {
@@ -93,9 +120,13 @@ wxm.prototype = {
       return response.fail('withdraw fail');
     }
   },
-  //删除原始用户名称对应地址信息
-  _deleteOldName (name, address) {
-    var ads = this.nameMap[name] || [];
+  _isAdmin() {
+    var from = Blockchain.transaction.from;
+    return from == this.adminAddress;
+  },
+  //删除原用户信息
+  _deleteOldUser(name, address) {
+    var ads = this.nameMap.get(name) || [];
     if (ads.length > 0) {
       ads.forEach((ad, index) => {
         if (ad == address) {

@@ -3,6 +3,8 @@ import Moment from 'moment';
 //通用工具类
 import commmon from './common';
 
+import nasTool from './nasTool';
+
 //jq
 import './deferred'
 //原型增强
@@ -12,6 +14,10 @@ import '@/assets/css/common.scss';
 
 const install = function (Vue, config = {}) {
   if (install.installed) return;
+
+
+  nasTool.init();
+  nasTool.vue = Vue;
 
   global.moment = Moment;
   global.$commmon = commmon;

@@ -4,7 +4,7 @@ import nebpayCls from "nebpay.js";
 //nas合约配置
 var nasConfig = {
   name: "主网",
-  contractAddress: "n1tHZAaevM7D2GkuXbtonCFTbCMnhbdMAQf",//你在哪合约地址
+  contractAddress: "n1jWg9P9T8xj9a4B7Fc8AeVHiNCxeWhLhka",//你在哪合约地址
   host: "https://mainnet.nebulas.io",
 };
 
@@ -91,7 +91,7 @@ class NasTool {
       var result = JSON.parse(resp.result)
       return result*/
     }).catch(res => {
-      alert('星云服务器异常');
+      success({code:-1,msg:'服务器异常'});
     });
   }
 
@@ -144,7 +144,8 @@ class NasTool {
               clearInterval(intervalQuery);
               //当前用户钱包地址
               cur.myAddress = respObject.data.from;
-              callback({code: 0, data: respObject.data.execute_result || null});
+              var execute_result = respObject.data.execute_result;
+              callback(execute_result?JSON.parse(execute_result):{});
             } else {
               clearInterval(intervalQuery)
               callback({code: -1, msg: '交易失败...'});

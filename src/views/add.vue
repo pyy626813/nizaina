@@ -25,11 +25,14 @@
             <!--<Tooltip content="他人" placement="right"><Icon type="help"></Icon></Tooltip>-->
           </legend>
         </fieldset>
-        <FormItem label="联系地址" prop="address">
-          <Input v-model="user._address" placeholder="请输入地址"></Input>
+        <FormItem label="联系地址" prop="_address">
+          <Input v-model="user._address"></Input>
         </FormItem>
-        <FormItem label="联系号码" prop="phone">
-          <Input v-model="user._phone" placeholder="请输入手机号"></Input>
+        <FormItem label="联系号码" prop="_phone">
+          <Input v-model="user._phone"></Input>
+        </FormItem>
+        <FormItem label="备注" prop="_memo">
+          <Input v-model="user._memo"></Input>
         </FormItem>
         <FormItem>
           <Button type="primary" @click="submitUser">登记
@@ -55,7 +58,8 @@
           gender: 'M',
           descr: null,
           _address: null,
-          _phone: null
+          _phone: null,
+          _msg:null
         },
         ruleValidate: {
           name: [
@@ -66,10 +70,18 @@
             {type: 'number', Range: [1, 150], message: '年龄必须在1-150之间'}
           ],
           descr: [
-            {type: 'string', max: 300, message: '不能超过300个字符', trigger: 'blur'}
+            {required: true, message: '总得说点什么吧'},
+            {type: 'string', max: 200, message: '不能超过200个字符', trigger: 'blur'}
           ],
-          phone: [
+          _phone: [
             {type: 'string', pattern: /(^1[3|4|5|7|8|9]\d{9}$)|(^09\d{8}$)/, message: '格式不正确'}
+          ],
+          _address:[
+            {required: true, message: '必填项',trigger: 'blur'},
+            {type: 'string', max: 200, message: '不能超过200个字符', trigger: 'blur'}
+          ],
+          _memo:[
+            {type: 'string', max: 100, message: '不能超过100个字符', trigger: 'blur'}
           ]
         },
         loadingModal: null
@@ -80,13 +92,13 @@
         this.$refs.userForm.validate(valid => {
           if (valid) {
             user.add(this.user, res => {
-              console.log(res)
               if(res.loading != undefined){
                 this.loading(res.loading,res.msg);
               }else{
                 this.loading(false);
                 if(res.code == 0){
                   this.$Message.success('登记成功！');
+                  this.toList();
                 }else{
                   this.$Message.error(res.msg || '登记失败');
                 }

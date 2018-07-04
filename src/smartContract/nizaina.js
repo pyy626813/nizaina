@@ -1,15 +1,15 @@
 'use strict';
 
 //用户隐私信息属性
-var secretProps = ['_address', '_phone'];
+var secretProps = ['_address', '_phone', '_memo'];
 
 class response {
   static ok(data, msg) {
     return {code: 0, data: data, msg: msg}
   }
 
-  static fail(msg,code) {
-    return {msg: msg,code: code || -1}
+  static fail(msg, code) {
+    return {msg: msg, code: code || -1}
   }
 }
 
@@ -30,9 +30,9 @@ wxm.prototype = {
   },
   addUserInfo(user) {
     var value = Blockchain.transaction.value;
-    if(value < 0.01){
+    if (value < 0.01) {
       //支付金额不足0.01
-      return response.fail('money is less than 0.01',-2);
+      return response.fail('money is less than 0.01', -2);
     }
 
     var from = Blockchain.transaction.from;
@@ -84,17 +84,17 @@ wxm.prototype = {
     var value = Blockchain.transaction.value;
     if (value < this.priceForSecret) {
       //支付金额不足
-      return response.fail('money is less than ' + this.priceForSecret,-2);
+      return response.fail('money is less than ' + this.priceForSecret, -2);
     }
 
     var user = this.userMap.get(fromAddress);
     var rs = {};
     if (user) {
       secretProps.forEach(prop => {
-        rs = user[prop];
+        rs[prop] = user[prop];
       });
     }
-    return rs;
+    return response.ok(rs);
   },
   //调整查看隐私信息手术费
   adjustPriceForSecret(price) {
@@ -105,7 +105,7 @@ wxm.prototype = {
       price = 0;
     }
     this.priceForSecret = parseFloat(price);
-    return super.ok(null, '调整后');
+    return response.ok(null, '调整后费用:' + this.priceForSecret);
   },
   //提现至管理员
   withdraw(value) {
